@@ -1,12 +1,3 @@
-'''
-ToDos: 
-- loads and display image with OpenCV
-- clicking into image user should be able to select four points
-- selected region is wrapped into rectangle
-- wraped result should be displayed
-- pressing S in the result view, the image should be saved
-- Paths to the input file and output destination and results resolution should be specified via terminal
-''' 
 import cv2
 import sys
 import numpy as np
