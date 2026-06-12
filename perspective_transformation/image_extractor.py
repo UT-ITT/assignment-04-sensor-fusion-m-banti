@@ -20,15 +20,35 @@ if len(sys.argv) != 5:
 input_file = sys.argv[1]
 output_dest = sys.argv[2]
 
-if not os.path.splitext(output_dest)[1]:
-    output_dest += ".png"
-    print(f"Ooooops, forgot the extension??? No worries, I will save it as: {output_dest}")
+#if not os.path.splitext(output_dest)[1]:
+#    output_dest += ".png"
+#    print(f"Ooooops, forgot the extension??? No worries, I will save it as: {output_dest}")
+
+# so since macbook is a lil stingy with paths and I tried it now several times I implemented guidlines
+# for dummies like meyself
+
+
+# user (me) parsed stupidly existing folder instead of a real file
+if os.path.isdir(output_dest):
+    output_dest = os.path.join(output_dest, "extracted_image.png")
+    print(f"Oh, you gave me a folder (couldn't be me *cough* *cough*! I'll save the file inside it as: {output_dest}")
+else:
+    # check if folder part of path is available, otherwise create one
+    output_dir = os.path.dirname(output_dest)
+    if output_dir and not os.path.exists(output_dir):
+        os.makedirs(output_dir, exist_ok=True)
+        print(f"Created a shiny new folder for you: {output_dir}")
+        
+    # safeguard for the OpenCV extension error that I got three time sin a row
+    if not os.path.splitext(output_dest)[1]:
+        output_dest += ".png"
+        print(f"Ooooops, forgot the extension??? No worries, I will save it as: {output_dest}")
 
 try:
     res_w = int(sys.argv[3])
     res_h = int(sys.argv[4])
 except ValueError:
-    print("Resolution needs to be numbers >:((((")
+    print("Resolution needs to be numbers, not whatever this is (⇀‸↼‶) ")
     sys.exit(1)
 
 # global state variables
@@ -67,7 +87,7 @@ def mouse_callback(event, x, y, flags, param):
             cv2.imshow("image", img_clone) # type: ignore
             print(f"Point {len(selected_points)} selected!")
             
-            # if we got 4 points, time to warp!
+            # warp the 4 points
             if len(selected_points) == 4:
                 print("Got 4 points! Warping timeeee")
                 process_warp()
@@ -86,28 +106,29 @@ def process_warp():
     matrix = cv2.getPerspectiveTransform(pts1, pts2) # type: ignore
     warped_img = cv2.warpPerspective(img_original, matrix, (res_w, res_h)) # type: ignore
     
-    cv2.imshow("result", warped_img)
+    # Fixed window name to match the one you destroy in reset_selection!
+    cv2.imshow("I like it, Picasso!!! (｡•̀ᴗ-)✧", warped_img)
     
     # wait for user input on the result window
     while True:
         key = cv2.waitKey(0) & 0xFF
         
-        # esc to discard
+        # d to discard
         if key == ord('d') or key == ord('D'):
-            print("Discarded >:(((( Let's try again.")
+            print("Discarded (╬ Ò﹏Ó). Let's try again.")
             reset_selection()
             break
 
         # s to save
         elif key == ord('s') or key == ord('S'):
             cv2.imwrite(output_dest, warped_img)
-            print(f"Saved masterpiece to: {output_dest} !! Great job!!")
+            print(f"Saved masterpiece to: {output_dest} !! Great job!! ٩(◕‿◕｡)۶")
             reset_selection()
             break
             
-        # x to exit
-        elif key == ord('x') or key == ord('X'):
-            print("Exiting completely... Bye bye!")
+        # esc to exit completely
+        elif key == 27:
+            print("Exiting completely... Bye bye! (￣▽￣)ノ")
             cv2.destroyAllWindows()
             sys.exit(0)
 
@@ -117,7 +138,7 @@ def reset_selection():
     selected_points = []
     img_clone = img_original.copy() # type: ignore
     try:
-        cv2.destroyWindow("I like it, Picasso!!")
+        cv2.destroyWindow("I like it, Picasso!!! (｡•̀ᴗ-)✧")
     except:
         pass
     cv2.imshow("image", img_clone)
@@ -126,7 +147,7 @@ def reset_selection():
 img_original = cv2.imread(input_file)
 
 if img_original is None:
-    print("Could not open image >:( Check your path!")
+    print("Could not open image (」°ロ°)」Check your path!")
     sys.exit(1)
 
 img_clone = img_original.copy()
@@ -143,11 +164,19 @@ cv2.imshow("image", img_clone)
 try:
     while True:
         key = cv2.waitKey(1) & 0xFF
+        
         # esc on main window to quit entirely
-        if key == ord('d') or key == ord('D') and len(selected_points) < 4:
-            print("Canceled :(")
+        if key == 27:
+            print("Canceled (╥_╥)")
             break
+            
+        # d to discard if you mess up selecting points before reaching 4
+        elif key == ord('d') or key == ord('D'):
+            if len(selected_points) > 0:
+                print("Discarded current points (╬ Ò﹏Ó). Let's try again.")
+                reset_selection()
+                
 except KeyboardInterrupt:
-    print("Canceled :(")
+    print("Canceled (╥_╥)")
 
 cv2.destroyAllWindows()
