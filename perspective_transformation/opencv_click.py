@@ -9,10 +9,10 @@ def mouse_callback(event, x, y, flags, param):
     global img
 
     if event == cv2.EVENT_LBUTTONDOWN:
-        img = cv2.circle(img, (x, y), 5, (255, 0, 0), -1)
+        img = cv2.circle(img, (x, y), 5, (255, 0, 0), -1) # type: ignore
         cv2.imshow(WINDOW_NAME, img)
 
-cv2.imshow(WINDOW_NAME, img)
+cv2.imshow(WINDOW_NAME, img) # type: ignore
 
 cv2.setMouseCallback(WINDOW_NAME, mouse_callback)
 
