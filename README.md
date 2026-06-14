@@ -27,7 +27,7 @@ Example:
 
 #### Assets
 
-(Source of: image.jpg)[https://en.meming.world/wiki/File:Crying_Cat.jpg/]
+[Source of: image.jpg](https://en.meming.world/wiki/File:Crying_Cat.jpg/)
 
 This repository was implemented via Apple Silicon M4 Chip. In addition I used Pillow instead of Pill because of that:
 
