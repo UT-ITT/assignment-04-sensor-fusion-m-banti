@@ -40,12 +40,7 @@ Welcome to your very own Augmented Reality shooting range!
     - Pew Pew: When your thumb "pulls the trigger" by going down towards your index finger, the crosshair turns red and shoots an orange projectile straight ahead!
     - The Enemies: Evil blue circles will continuously spawn from the right side of the board and rush toward your hand.
 - Goal:
-    - You shoot the circles to rack up your "Killed enemies" score until no circle is left! But be careful, if a circle touches any part of your physical hand inside the game board... wamp waaaamp, you lose!
-- Tipps:
-    - Having trouble with the skin detection? The game has you covered: 
-    - Press Arrow UP to switch to "Daylight Mode" (natural vitamin D lighting).
-    - Press Arrow DOWN to switch to "Nighttime/Werewolf Mode" (for moonlight gaming).
-    - Press Q or ESC to rage quit.
+    - You shoot the circles to rack up your "Killed enemies" score until no circle is left (10 enemies in total)! But be careful, if 5 circles reach the game board end... wamp waaaamp, you lose!
 
 
 ### How it works
