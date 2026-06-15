@@ -1,2 +1,4 @@
 # annoying mac file
 .DS_Store
+
+.venv
