@@ -81,7 +81,8 @@ Welcome to your very own Augmented Reality shooting range!
 
 - Sources:
     - Skin detection: https://pyimagesearch.com/2014/08/18/skin-detection-step-step-example-using-python-opencv/
-    - colorspace: https://www.geeksforgeeks.org/python/python-opencv-morphological-operations/
+    - Colorspace: https://www.geeksforgeeks.org/python/python-opencv-morphological-operations/
+    - Morphology: https://www.geeksforgeeks.org/python/python-opencv-morphological-operations/
     
 ## Sensor Fusion
 Because trusting just one sensor is boring, right? This script uses a complementary filter to fuse the camera position with your accelerometer data to produce a much smoother prediction.
