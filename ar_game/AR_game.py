@@ -129,8 +129,13 @@ def track_pointer(frame):
     # set largest skin colored area as hand
     hand_contour = max(contours, key=cv2.contourArea)
     
+    # debug: make red border around recognized area
+    debug_frame = frame.copy()
+    cv2.drawContours(debug_frame, [hand_contour], -1, (0, 0, 255), 2)
+    cv2.imshow("hand area", debug_frame)
+    
     # cancel out noise
-    if cv2.contourArea(hand_contour) < 5000:
+    if cv2.contourArea(hand_contour) < 3000:
         return None
         
     # find most left point (index finger)
