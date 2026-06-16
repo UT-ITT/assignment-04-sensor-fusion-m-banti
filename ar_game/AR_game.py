@@ -106,14 +106,19 @@ current_bg_sprite = None
 
 def track_pointer(frame):
     # convert color to hsv
-    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    # hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    # switched here to ycrcb since it's better for skin tones
+    ycrcb = cv2.cvtColor(frame, cv2.COLOR_BGR2YCrCb)
     # filter anything except skin color
-    mask = cv2.inRange(hsv, LOWER_SKIN, UPPER_SKIN)
+    mask = cv2.inRange(ycrcb, LOWER_SKIN, UPPER_SKIN)
     
-    # cleanup noise
-    kernel = np.ones((5, 5), np.uint8)
-    mask = cv2.dilate(mask, kernel, iterations=2)
-    mask = cv2.GaussianBlur(mask, (5, 5), 100)
+    # cleanup noise using morphological operations: https://www.geeksforgeeks.org/python/python-opencv-morphological-operations/
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+    
+    # same as (but better): mask = cv2.dilate(mask, kernel, iterations=2)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel, iterations=1)
+    # same as (but better): mask = cv2.GaussianBlur(mask, (5, 5), 100)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=2)
     
     # search hand outlines
     contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
