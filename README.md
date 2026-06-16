@@ -30,17 +30,23 @@ Example:
 [Source of: image.jpg](https://en.meming.world/wiki/File:Crying_Cat.jpg/)
 
 ## AR Game
-This is a Aruco Shooter game!!
+Welcome to the Balloorina Shooting Range!
+
+Here you can fight evil balloons spawing from hell. The evil balloons will try to reach the sky but you my adventurer need to stop the spawns from hell by shooting at them! Will I give you a weapon? No my dear youngling, the weapon was always within you, more precisely just use your damn hands *mumbling* those damn kids. By using your right hand doing a finger gun motion, projectiles will kill those darn balloons.
 
 ### Gameplay
-Welcome to your very own Augmented Reality shooting range!
+1. Show the Aruco Board to the camera
+2. Take your **LEFT HAND** and do a finger gun gesture to enter from the **LEFT SIDE** of the aruco board the game area
+3. Shoot at the balloons by moving your thumb down to your index finger (pull the trigger)
+4. Repeat until you killed 10 balloons or until you loose by letting 5 ballons out of the frame
+5. Have Fun
 
 - Controls:
-    - The Weapon: You use your hand to do a "finger gun" sign. Your index finger acts as your crosshair (it glows green when ready to fire).
-    - Pew Pew: When your thumb "pulls the trigger" by going down towards your index finger, the crosshair turns red and shoots an orange projectile straight ahead!
-    - The Enemies: Evil blue circles will continuously spawn from the right side of the board and rush toward your hand.
+    - The Weapon: You use your **LEFT** hand to do a "finger gun" sign. Your index finger acts as your crosshair (it glows green when ready to fire).
+    - Pew Pew: When your thumb "pulls the trigger" by going down towards your index finger, the crosshair turns red and shoots an orange projectile straight ahead! It stays red until you release your trigger(finger)
+    - The Enemies: Evil balloons will float continuously spawn from hell and rush towards the sky.
 - Goal:
-    - You shoot the circles to rack up your "Killed enemies" score until no circle is left (10 enemies in total)! But be careful, if 5 circles reach the game board end... wamp waaaamp, you lose!
+    - You shoot the ballons to rack up your "Killed enemies" score until you killed 10 enemies in total! But be careful, if 5 evil balloons reach the sky... wamp waaaamp, you lose!
 
 
 ### How it works
@@ -78,9 +84,10 @@ Welcome to your very own Augmented Reality shooting range!
 
 
 #### Assets
-
 - Sources:
     - Skin detection: https://pyimagesearch.com/2014/08/18/skin-detection-step-step-example-using-python-opencv/
+    - Colorspace: https://learnopencv.com/color-spaces-in-opencv-cpp-python/
+    - Morphology: https://www.geeksforgeeks.org/python/python-opencv-morphological-operations/
     
 ## Sensor Fusion
 Because trusting just one sensor is boring, right? This script uses a complementary filter to fuse the camera position with your accelerometer data to produce a much smoother prediction.
@@ -102,6 +109,6 @@ Because trusting just one sensor is boring, right? This script uses a complement
 #### Reflection on Alpha Values
 When trying out different alpha values I noticed following:
 
-- If alpha is close to 0.0 (trusting the camera), the prediction is highly accurate but suffers from camera lag and lower frame rates.
-- If alpha is close to 1.0 (trusting the accelerometer), the movement of the green dot gets incredibly snappy and smooth but it drifts out of bounds very fast because of sensor noise.
-- So the sweet spot is around 0.8 to 0.9. It keeps it snappy but the camera constantly drags the prediction back to the right position.
+- If I crank the weight alpha way up (close to 1.0), the system mostly trusts the accelerometer. In theory, this should give super fast and smooth tracking for sudden movements. But since I'm using an older phone, the sensor is pretty noisy. Because the code has to integrate that noise twice to figure out the position, the math errors build up insanely fast and my green prediction dot just drifts crazy off the screen over time.
+- On the otherside, if I set alpha really low (close to 0.0), the system relies almost entirely on the aruco camera tracking. The drift completely disappears and the absolute position is spot on, but the tracking feels pretty laggy and jittery since it's bottlenecked by my webcam's framerate.
+- The sweetspot is using the accelerometer to make the movement feel smooth and responsive, while the camera acts like an anchor pulling the prediction back to reality so it doesn't just drift away forever.
