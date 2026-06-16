@@ -130,23 +130,38 @@ def track_pointer(frame):
     hand_contour = max(contours, key=cv2.contourArea)
     
     # debug: make red border around recognized area
-    debug_frame = frame.copy()
-    cv2.drawContours(debug_frame, [hand_contour], -1, (0, 0, 255), 2)
-    cv2.imshow("hand area", debug_frame)
+    cv2.drawContours(frame, [hand_contour], -1, (0, 0, 255), 2)
+
     
     # cancel out noise
     if cv2.contourArea(hand_contour) < 3000:
         return None
         
     # find most left point (index finger)
-    index_tip = min(hand_contour, key=lambda p: p[0][0])[0]
+    index_tip = max(hand_contour, key=lambda p: p[0][0])[0]
     # find most up point (thumb)
     thumb_tip = min(hand_contour, key=lambda p: p[0][1])[0]
     # gap between thumb tip and index finger
     vertical_gap = abs(index_tip[1] - thumb_tip[1])
     
+    # big debug: to see if thumb is highets point 
+    # convert points to tuples to draw
+    idx_p = tuple(index_tip)
+    tmb_p = tuple(thumb_tip)
+    # blue crosshair
+    cv2.circle(frame, tmb_p, 7, (255, 0, 0), 2)
+    cv2.line(frame, (tmb_p[0]-12, tmb_p[1]), (tmb_p[0]+12, tmb_p[1]), (255, 0, 0), 2)
+    cv2.line(frame, (tmb_p[0], tmb_p[1]-12), (tmb_p[0], tmb_p[1]+12), (255, 0, 0), 2)
+    # yeelow vertical gap line
+    cv2.line(frame, idx_p, tmb_p, (0, 255, 255), 2)
+    # green text for firing is in range, red if not
+    text_color = (0, 255, 0) if vertical_gap < 30 else (0, 0, 255)
+    cv2.putText(frame, f"Gap: {vertical_gap}px", (idx_p[0] + 20, idx_p[1] - 20), 
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, text_color, 2)
+    
+    
     # finger gun fires when thumb "pull the trigger" 
-    is_firing = vertical_gap <30
+    is_firing = vertical_gap < 70
     
     return tuple(index_tip), is_firing
     
@@ -191,6 +206,12 @@ def update(dt):
         # locking of warped board
         warped_frame = cv2.warpPerspective(frame, saved_matrix, (CAM_WIDTH, CAM_HEIGHT))
         
+        # debug: version of warped board
+        tracking_canvas = cv2.resize(warped_frame, (640, 360))
+        pointer_data = track_pointer(tracking_canvas)
+        # debug: red contour on main display
+        cv2.resize(tracking_canvas, (CAM_WIDTH, CAM_HEIGHT), dst=warped_frame)
+        
         board_x = -100 
         board_y = -100
         
@@ -198,13 +219,17 @@ def update(dt):
         if pointer_data is not None:
             # unapck data
             pointer_coords, is_firing = pointer_data
-            
+            '''
             raw_pt = np.array([[[float(pointer_coords[0]) * scale_factor, float(pointer_coords[1]* scale_factor)]]], dtype=np.float32)
             # map camera pixel to warped board pixel
             mapped_pt = cv2.perspectiveTransform(raw_pt, saved_matrix)
             
             board_x = int(mapped_pt[0][0][0])
             board_y = int(mapped_pt[0][0][1])
+            '''
+            # simpler perspective transformation
+            board_x = int(pointer_coords[0] * scale_factor)
+            board_y = int(pointer_coords[1] * scale_factor)
             
             # firing logic
             if is_firing and trigger_state == 0 and game_over is None:
