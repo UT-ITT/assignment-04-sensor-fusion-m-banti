@@ -1,22 +1,12 @@
 '''
-ToDo's:
-- webcam readout (similar to exercise)
-- detect aruco markers
-- get aruco area is rectangle with same resolution as webcam (variable resolution)
-- display warped rectangle in pyglet
-- Game Mechanics: tarcking object (not from aruco markers)
-    - example: use finger to destroy target object or to move things around   
-'''
-
-'''
-Current Problems:
+Past Problems:
 - wrong aruco version (fixed)
 - only 1 of 4 markers are being detected (fixed)
 - using hand gets markers blocked and perspective wrap goes away (fixed)
-- everything flipped
+- everything flipped (fixed)
 - bullets shoot in wrong direction (prob. fix: mirroring earlier) (fixed)
 - bullets shoot continiously (fixed)
-- room needs to be kinda dark to play
+- room needs to be kinda dark to play (fixed)
 '''
 import cv2
 import cv2.aruco as aruco
