@@ -298,8 +298,6 @@ def update(dt):
         
     # conversion frame to pyglet
     init_warped_frame = cv2.cvtColor(warped_frame, cv2.COLOR_BGR2RGB)
-    # mirroring window
-    init_warped_frame = cv2.flip(init_warped_frame, 1)
     
     if saved_matrix is None:
         cv2.putText(init_warped_frame, f"Searching... Markers visible: {marker_count}/4", (30, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
