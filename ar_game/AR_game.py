@@ -41,13 +41,15 @@ enemies_killed = 0
 enemies_missed = 0
 game_over = None
 
-total_enemies = 10
-loose_enemy_count = 5
+TOTAL_ENEMIES = 10
+LOOSE_ENEMY_COUNT = 5
 
 ENEMY_MIN_SPEED = 3
 ENEMY_MAX_SPEED = 6
 
 BULLET_SPEED = 40
+
+VERTICAL_GAP = 80
 
 # skin color range
 LOWER_SKIN = np.array([0, 133, 77], dtype=np.uint8)
@@ -104,7 +106,7 @@ def cv2glet(img,fmt):
     return pyimg
 
 
-win = pyglet.window.Window(CAM_WIDTH, CAM_HEIGHT, caption="AR Game (｡•̀ᴗ-)✧")
+win = pyglet.window.Window(CAM_WIDTH, CAM_HEIGHT, caption="Ballorina Shooring Range (｡•̀ᴗ-)✧")
 current_bg_sprite = None
 
 def track_pointer(frame):
@@ -132,10 +134,6 @@ def track_pointer(frame):
     # set largest skin colored area as hand
     hand_contour = max(contours, key=cv2.contourArea)
     
-    # debug: make red border around recognized area
-    cv2.drawContours(frame, [hand_contour], -1, (0, 0, 255), 2)
-
-    
     # cancel out noise
     if cv2.contourArea(hand_contour) < 3000:
         return None
@@ -145,33 +143,16 @@ def track_pointer(frame):
     # find most up point (thumb)
     thumb_tip = min(hand_contour, key=lambda p: p[0][1])[0]
     # gap between thumb tip and index finger
-    vertical_gap = abs(index_tip[1] - thumb_tip[1])
-    
-    # big debug: to see if thumb is highets point 
-    # convert points to tuples to draw
-    idx_p = tuple(index_tip)
-    tmb_p = tuple(thumb_tip)
-    # blue crosshair
-    cv2.circle(frame, tmb_p, 7, (255, 0, 0), 2)
-    cv2.line(frame, (tmb_p[0]-12, tmb_p[1]), (tmb_p[0]+12, tmb_p[1]), (255, 0, 0), 2)
-    cv2.line(frame, (tmb_p[0], tmb_p[1]-12), (tmb_p[0], tmb_p[1]+12), (255, 0, 0), 2)
-    # yeelow vertical gap line
-    cv2.line(frame, idx_p, tmb_p, (0, 255, 255), 2)
-    # green text for firing is in range, red if not
-    text_color = (0, 255, 0) if vertical_gap < 30 else (0, 0, 255)
-    cv2.putText(frame, f"Gap: {vertical_gap}px", (idx_p[0] + 20, idx_p[1] - 20), 
-                cv2.FONT_HERSHEY_SIMPLEX, 0.5, text_color, 2)
-    
+    current_gap = abs(index_tip[1] - thumb_tip[1])
     
     # finger gun fires when thumb "pull the trigger" 
-    is_firing = vertical_gap < 80
+    is_firing = current_gap < VERTICAL_GAP
     
     return tuple(index_tip), is_firing
     
 
 def update(dt):
     global current_bg_sprite, detector, saved_matrix, bullets, trigger_state, enemies_killed, enemies_missed, game_over
-    
     
     ret, frame = cam.read()
     if not ret:
@@ -209,10 +190,9 @@ def update(dt):
         # locking of warped board
         warped_frame = cv2.warpPerspective(frame, saved_matrix, (CAM_WIDTH, CAM_HEIGHT))
         
-        # debug: version of warped board
         tracking_canvas = cv2.resize(warped_frame, (640, 360))
         pointer_data = track_pointer(tracking_canvas)
-        # debug: red contour on main display
+
         cv2.resize(tracking_canvas, (CAM_WIDTH, CAM_HEIGHT), dst=warped_frame)
         
         board_x = -100 
@@ -222,14 +202,7 @@ def update(dt):
         if pointer_data is not None:
             # unapck data
             pointer_coords, is_firing = pointer_data
-            '''
-            raw_pt = np.array([[[float(pointer_coords[0]) * scale_factor, float(pointer_coords[1]* scale_factor)]]], dtype=np.float32)
-            # map camera pixel to warped board pixel
-            mapped_pt = cv2.perspectiveTransform(raw_pt, saved_matrix)
-            
-            board_x = int(mapped_pt[0][0][0])
-            board_y = int(mapped_pt[0][0][1])
-            '''
+
             # simpler perspective transformation
             board_x = int(pointer_coords[0] * scale_factor)
             board_y = int(pointer_coords[1] * scale_factor)
@@ -320,9 +293,6 @@ def update(dt):
     else:
         # normal camera view until 4 markers are found
         warped_frame = frame.copy()
-        if ids is not None:
-            cv2.aruco.drawDetectedMarkers(warped_frame, corners, ids)
-        cv2.putText(warped_frame, f"Searching... Markers visible: {marker_count}/4", (30, 130), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
 
     cv2.waitKey(1)
         
@@ -335,7 +305,7 @@ def update(dt):
         cv2.putText(init_warped_frame, f"Searching... Markers visible: {marker_count}/4", (30, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
     else:
         # Mini Scoreboard
-        cv2.putText(init_warped_frame, f"Kills: {enemies_killed}/{total_enemies}   Missed: {enemies_missed}/{loose_enemy_count}", (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
+        cv2.putText(init_warped_frame, f"Kills: {enemies_killed}/{TOTAL_ENEMIES}   Missed: {enemies_missed}/{LOOSE_ENEMY_COUNT}", (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
         
         # End Game Text
         if game_over == "WIN":
@@ -347,7 +317,6 @@ def update(dt):
     img_data = cv2glet(init_warped_frame, 'RGB')
     current_bg_sprite = pyglet.sprite.Sprite(img=img_data, x=0, y=0)
     
-
 @win.event
 def on_draw():
     win.clear()
