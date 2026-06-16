@@ -10,13 +10,13 @@ ToDo's:
 
 '''
 Current Problems:
-- Phone Camera and Macbook connection doesn't work 
 - wrong aruco version (fixed)
 - only 1 of 4 markers are being detected (fixed)
 - using hand gets markers blocked and perspective wrap goes away (fixed)
 - everything flipped
 - bullets shoot in wrong direction (prob. fix: mirroring earlier) (fixed)
 - bullets shoot continiously (fixed)
+- room needs to be kinda dark to play
 '''
 import cv2
 import cv2.aruco as aruco
@@ -40,6 +40,9 @@ enemies = []
 enemies_killed = 0
 enemies_missed = 0
 game_over = None
+
+total_enemies = 10
+loose_enemy_count = 5
 
 ENEMY_SPEED = 5
 
@@ -252,7 +255,7 @@ def update(dt):
                     if b_dist < (e["radius"]+8):
                         if e in enemies: 
                             enemies.remove(e)
-                            enemies_killed += 1 # <- ADDED KILL TRACKER
+                            enemies_killed += 1 
                         if b in bullets: 
                             bullets.remove(b)
                             
@@ -287,12 +290,11 @@ def update(dt):
     # mirroring window
     init_warped_frame = cv2.flip(init_warped_frame, 1)
     
-    # --- ADD THIS ENTIRE TEXT DRAWING BLOCK ---
     if saved_matrix is None:
         cv2.putText(init_warped_frame, f"Searching... Markers visible: {marker_count}/4", (30, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
     else:
         # Mini Scoreboard
-        cv2.putText(init_warped_frame, f"Kills: {enemies_killed}/20   Missed: {enemies_missed}/5", (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
+        cv2.putText(init_warped_frame, f"Kills: {enemies_killed}/{total_enemies}   Missed: {enemies_missed}/{loose_enemy_count}", (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
         
         # End Game Text
         if game_over == "WIN":
