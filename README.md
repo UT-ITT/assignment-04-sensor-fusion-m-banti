@@ -30,17 +30,23 @@ Example:
 [Source of: image.jpg](https://en.meming.world/wiki/File:Crying_Cat.jpg/)
 
 ## AR Game
-This is a Aruco Shooter game!!
+Welcome to the Balloorina Shooting Range!
+
+Here you can fight evil balloons spawing from hell. The evil balloons will try to reach the sky but you my adventurer need to stop the spawns from hell by shooting at them! Will I give you a weapon? No my dear youngling, the weapon was always within you, more precisely just use your damn hands *mumbling* those damn kids. By using your right hand doing a finger gun motion, projectiles will kill those darn balloons.
 
 ### Gameplay
-Welcome to your very own Augmented Reality shooting range!
+1. Show the Aruco Board to the camera
+2. Take your **LEFT HAND** and do a finger gun gesture to enter from the **LEFT SIDE** of the aruco board the game area
+3. Shoot at the balloons by moving your thumb down to your index finger (pull the trigger)
+4. Repeat until you killed 10 balloons or until you loose by letting 5 ballons out of the frame
+5. Have Fun
 
 - Controls:
-    - The Weapon: You use your hand to do a "finger gun" sign. Your index finger acts as your crosshair (it glows green when ready to fire).
-    - Pew Pew: When your thumb "pulls the trigger" by going down towards your index finger, the crosshair turns red and shoots an orange projectile straight ahead!
-    - The Enemies: Evil blue circles will continuously spawn from the right side of the board and rush toward your hand.
+    - The Weapon: You use your **LEFT** hand to do a "finger gun" sign. Your index finger acts as your crosshair (it glows green when ready to fire).
+    - Pew Pew: When your thumb "pulls the trigger" by going down towards your index finger, the crosshair turns red and shoots an orange projectile straight ahead! It stays red until you release your trigger(finger)
+    - The Enemies: Evil balloons will float continuously spawn from hell and rush towards the sky.
 - Goal:
-    - You shoot the circles to rack up your "Killed enemies" score until no circle is left (10 enemies in total)! But be careful, if 5 circles reach the game board end... wamp waaaamp, you lose!
+    - You shoot the ballons to rack up your "Killed enemies" score until you killed 10 enemies in total! But be careful, if 5 evil balloons reach the sky... wamp waaaamp, you lose!
 
 
 ### How it works
@@ -78,10 +84,9 @@ Welcome to your very own Augmented Reality shooting range!
 
 
 #### Assets
-
 - Sources:
     - Skin detection: https://pyimagesearch.com/2014/08/18/skin-detection-step-step-example-using-python-opencv/
-    - Colorspace: https://www.geeksforgeeks.org/python/python-opencv-morphological-operations/
+    - Colorspace: https://learnopencv.com/color-spaces-in-opencv-cpp-python/
     - Morphology: https://www.geeksforgeeks.org/python/python-opencv-morphological-operations/
     
 ## Sensor Fusion
