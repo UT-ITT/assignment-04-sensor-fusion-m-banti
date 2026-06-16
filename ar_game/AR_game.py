@@ -46,9 +46,9 @@ loose_enemy_count = 5
 
 ENEMY_SPEED = 5
 
-# skin color range (Die strengen Werte gegen das Whiteboard!)
-LOWER_SKIN = np.array([0, 80, 70], dtype=np.uint8)
-UPPER_SKIN = np.array([20, 255, 255], dtype=np.uint8)
+# skin color range
+LOWER_SKIN = np.array([0, 133, 77], dtype=np.uint8)
+UPPER_SKIN = np.array([255, 173, 127], dtype=np.uint8)
 
 if len(sys.argv) > 1:
     video_id = int(sys.argv[1])
