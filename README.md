@@ -109,6 +109,6 @@ Because trusting just one sensor is boring, right? This script uses a complement
 #### Reflection on Alpha Values
 When trying out different alpha values I noticed following:
 
-- If alpha is close to 0.0 (trusting the camera), the prediction is highly accurate but suffers from camera lag and lower frame rates.
-- If alpha is close to 1.0 (trusting the accelerometer), the movement of the green dot gets incredibly snappy and smooth but it drifts out of bounds very fast because of sensor noise.
-- So the sweet spot is around 0.8 to 0.9. It keeps it snappy but the camera constantly drags the prediction back to the right position.
+- If I crank the weight alpha way up (close to 1.0), the system mostly trusts the accelerometer. In theory, this should give super fast and smooth tracking for sudden movements. But since I'm using an older phone, the sensor is pretty noisy. Because the code has to integrate that noise twice to figure out the position, the math errors build up insanely fast and my green prediction dot just drifts crazy off the screen over time.
+- On the otherside, if I set alpha really low (close to 0.0), the system relies almost entirely on the aruco camera tracking. The drift completely disappears and the absolute position is spot on, but the tracking feels pretty laggy and jittery since it's bottlenecked by my webcam's framerate.
+- The sweetspot is using the accelerometer to make the movement feel smooth and responsive, while the camera acts like an anchor pulling the prediction back to reality so it doesn't just drift away forever.

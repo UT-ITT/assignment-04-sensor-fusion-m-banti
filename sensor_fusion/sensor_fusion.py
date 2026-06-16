@@ -3,6 +3,7 @@ import cv2.aruco as aruco
 import sys
 import numpy as np
 import pyglet
+from PIL import Image
 from pyglet.window import key
 from DIPPID import SensorUDP
 
@@ -14,12 +15,16 @@ SMARTPHONE_MARKER_ID = 5
 # globals
 video_id = 0
 saved_matrix = None
-alpha = 0.5
+alpha = 0.1
 
 # fusion tracking vars
 p_cam = [0.0, 0.0]
 p_pred = [0.0, 0.0]
 velocity = [0.0, 0.0]
+
+# setup DIPPID sensor
+print(f"Connecting to port {PORT}")
+sensor = SensorUDP(PORT)
 
 if len(sys.argv) > 1:
     video_id = int(sys.argv[1])
@@ -42,10 +47,6 @@ aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_6X6_250)
 aruco_params = aruco.DetectorParameters()
 detector = aruco.ArucoDetector(aruco_dict, aruco_params)
 
-# setup DIPPID sensor
-print(f"Connecting to port {PORT}")
-sensor = SensorUDP(PORT)
-
 # user interaction DIPPID app
 def on_button(value):
     global p_pred, p_cam, velocity
@@ -56,7 +57,7 @@ def on_button(value):
         velocity = [0.0, 0.0]
 
 sensor.register_callback("button_1", on_button)
-print("Ready. Time to make some nooooooise!")
+print("Ready?")
 
 # ordering aruco markers
 def order_points(pts):
@@ -69,8 +70,27 @@ def order_points(pts):
     rect[3] = pts[np.argmax(diff)]
     return rect
 
+# converts OpenCV image to PIL image and then to pyglet texture
+def cv2glet(img,fmt):
+    if fmt == 'GRAY':
+      rows, cols = img.shape
+      channels = 1
+    else:
+      rows, cols, channels = img.shape
+
+    raw_img = Image.fromarray(img).tobytes()
+    top_to_bottom_flag = -1
+    bytes_per_row = channels*cols
+    pyimg = pyglet.image.ImageData(width=cols, 
+                                   height=rows, 
+                                   fmt=fmt, 
+                                   data=raw_img, 
+                                   pitch=top_to_bottom_flag*bytes_per_row)
+    return pyimg
+
 
 win = pyglet.window.Window(CAM_WIDTH, CAM_HEIGHT, caption="Sensor Fusion (｡•̀ᴗ-)✧")
+current_bg_sprite = None
 
 # graphics batch for fast rendering
 main_batch = pyglet.graphics.Batch()
@@ -82,7 +102,7 @@ alpha_label = pyglet.text.Label(f'Weight Alpha: {alpha:.2f}', x=20, y=CAM_HEIGHT
                                 font_size=14, batch=main_batch)
 
 def update(dt):
-    global saved_matrix, p_cam, p_pred, velocity, alpha
+    global saved_matrix, p_cam, p_pred, velocity, alpha, current_bg_sprite
     
     ret, frame = cam.read()
     if not ret:
@@ -144,14 +164,29 @@ def update(dt):
     p_pred[1] = alpha * p_accel_y + (1.0 - alpha) * p_cam[1]
     
     # update pyglet dot coordinates
-    # (Note: Pyglet has origin at bottom-left, so we invert Y for proper mapping!)
+    # Pyglet has origin at bottom-left, so we invert Y for proper mapping
     cam_dot.x, cam_dot.y = p_cam[0], CAM_HEIGHT - p_cam[1]
     pred_dot.x, pred_dot.y = p_pred[0], CAM_HEIGHT - p_pred[1]
+    
+    # warp fram for pyglet
+    if saved_matrix is not None:
+        display_frame = cv2.warpPerspective(frame, saved_matrix, (CAM_WIDTH, CAM_HEIGHT))
+    else:
+        # show normal camera view until the 4 board markers are found
+        display_frame = frame.copy()
+        cv2.putText(display_frame, "Searching for 4 board markers...", (30, 80), 
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
+    # convert OpenCV frame to Pyglet sprite
+    display_frame_rgb = cv2.cvtColor(display_frame, cv2.COLOR_BGR2RGB)
+    img_data = cv2glet(display_frame_rgb, 'RGB')
+    current_bg_sprite = pyglet.sprite.Sprite(img=img_data, x=0, y=0)
 
 
 @win.event
 def on_draw():
     win.clear()
+    if current_bg_sprite:
+        current_bg_sprite.draw()
     main_batch.draw()
 
 @win.event
@@ -176,6 +211,7 @@ def on_keypress(Symbol, Modifier):
     if Symbol == key.Q or Symbol == key.ESCAPE:
         cam.release()
         sensor.disconnect()
+        cv2.destroyAllWindows()
         pyglet.app.exit()
     
 if __name__ == "__main__":

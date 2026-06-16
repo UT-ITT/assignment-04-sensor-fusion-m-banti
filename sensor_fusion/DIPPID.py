@@ -30,8 +30,8 @@ class Sensor():
     def disconnect(self):
         self._receiving = False
         Sensor.instances.remove(self)
-        if self._connection_thread:
-            self._connection_thread.join()
+        if self._connection_thread: # type: ignore
+            self._connection_thread.join() # type: ignore
 
     # runs as a thread
     # receives json formatted data from sensor,
@@ -170,7 +170,7 @@ class SensorWiimote(Sensor):
         self._connect()
 
     def _connect(self):
-        import wiimote
+        import wiimote # type: ignore
 
         self._wiimote = wiimote.connect(self._btaddr)
         self._connection_thread = Thread(target=self._receive)
@@ -191,7 +191,7 @@ class SensorWiimote(Sensor):
                 self._update(f'button_' + button.lower(), state)
             sleep(0.001)
 
-    def _update(self, key, value):
+    def _update(self, key, value): # type: ignore
         self._add_capability(key)
         
         # do not notify callbacks on initialization
