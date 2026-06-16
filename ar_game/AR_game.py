@@ -44,7 +44,10 @@ game_over = None
 total_enemies = 10
 loose_enemy_count = 5
 
-ENEMY_SPEED = 5
+ENEMY_MIN_SPEED = 3
+ENEMY_MAX_SPEED = 6
+
+BULLET_SPEED = 40
 
 # skin color range
 LOWER_SKIN = np.array([0, 133, 77], dtype=np.uint8)
@@ -161,7 +164,7 @@ def track_pointer(frame):
     
     
     # finger gun fires when thumb "pull the trigger" 
-    is_firing = vertical_gap < 70
+    is_firing = vertical_gap < 80
     
     return tuple(index_tip), is_firing
     
@@ -234,7 +237,7 @@ def update(dt):
             # firing logic
             if is_firing and trigger_state == 0 and game_over is None:
                 # fire bullet with given speed
-                bullets.append({"x": board_x, "y": board_y, "speed": 25})
+                bullets.append({"x": board_x, "y": board_y, "speed": BULLET_SPEED})
                 # save state as bullet fired
                 trigger_state = 1
             elif is_firing and trigger_state == 1:
@@ -252,7 +255,6 @@ def update(dt):
             cv2.line(warped_frame, (board_x, board_y-20), (board_x, board_y+20), color, 2)
         
 
-        # projectile physics
         # copy list to delete bullets
         if game_over is None:
             # projectile physics
@@ -261,19 +263,24 @@ def update(dt):
                 cv2.circle(warped_frame, (b["x"], b["y"]), 8, (0, 165, 255), -1)
                 if b["x"] > CAM_WIDTH:
                     bullets.remove(b)
-                    
+                                
             # enemy spawning logic
-            if random.random() < 0.01:
+            if random.random() < 0.02: 
                 enemies.append({
-                    "x": CAM_WIDTH,
-                    "y": random.randint(59, CAM_HEIGHT - 50),
-                    "radius": 40 
+                    "x": random.randint(int(CAM_WIDTH * 2 / 3), CAM_WIDTH - 40),  # spawn area
+                    "y": CAM_HEIGHT + 50,  # start of enemy
+                    "radius": random.randint(20, 42),
+                    "speed": random.randint(ENEMY_MIN_SPEED, ENEMY_MAX_SPEED),
+                    "color": (random.randint(50, 255), random.randint(50, 255), random.randint(50, 255))
                 })
                 
             # enemy physics
             for e in enemies[:]:
-                e["x"] -= ENEMY_SPEED
-                cv2.circle(warped_frame, (int(e["x"]), int(e["y"])), int(e["radius"]), (255, 0, 0), -1)
+                e["y"] -= e["speed"]
+                # balloon shape
+                cv2.line(warped_frame, (int(e["x"]), int(e["y"] + e["radius"])), 
+                    (int(e["x"]), int(e["y"] + e["radius"] + 22)), (255, 255, 255), 2)
+                cv2.circle(warped_frame, (int(e["x"]), int(e["y"])), int(e["radius"]), e["color"], -1)
                 
                 # collision with hand (only if hand is tracked)
                 if board_x != -100:
@@ -294,7 +301,7 @@ def update(dt):
                         if b in bullets: 
                             bullets.remove(b)
                             
-                        # <- ADDED WIN CONDITION ->
+                        
                         if enemies_killed >= 10:
                             game_over = "WIN"
                             enemies.clear()
@@ -302,8 +309,7 @@ def update(dt):
                             
                 if game_over: break 
                 
-                # <- ADDED MISS CONDITION ->
-                if e in enemies and e["x"] < 0:
+                if e in enemies and (e["y"] + e["radius"]) < 0:
                     enemies.remove(e)
                     enemies_missed += 1
                     if enemies_missed >= 5:
