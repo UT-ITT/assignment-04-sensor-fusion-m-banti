@@ -1,0 +1,35 @@
+# m-banti (18.5/20P)
+
+## 1. Perspective Transformation (5/5P)
+* The image is successfully loaded and displayed 
+    * yep (1P)
+* Selecting the corner points works and there is visual feedback for the user 
+    * yep (1P) 
+* Perspective transformation to the target resolution works 
+    * yep (2P)
+* Command line parameters and shortcuts work 
+    * Please use short cuts consistent with the instruction, i thought the application crashed at first, but still fine (1P) 
+
+## 2. AR Game (9.5/10P)
+* The region of interest is detected, extracted, transformed, and displayed 
+    * The detected region is a bit off/weird. Includes the Aruco markers on the top but excludes the Aruco markers at the bottom (1.5P)
+* Objects (such as fingers) in the region of interest are tracked reliably and interaction with game objects work 
+    * Really interesting game mechanic!! Liked to test it and it also looks nice. (4P)
+* Game mechanics work 
+    * yep (2P)
+* Performance and latency is ok 
+    * yep (1P)
+* The program does not crash 
+    * yep (1P)
+
+## 3. Sensor Fusion (4/5P)
+* The moving marker is tracked, and its position is displayed in the pyglet window 
+    * yep (1P)
+* Accelerometer data is received from DIPPID and integrated over time 
+    * yep (1P)
+* The complementary filter blends camera and accelerometer data and the prediction is displayed in the pyglet window 
+    * formula not completely correct (0.5P)
+* The filter weight alpha can be adjusted at runtime, and the prediction can be reset using DIPPID 
+    * filter adjustment at runtime does not work (function name has to be 'on_key_press' not 'on_keypress')  (0.5P)
+* Write a short paragraph reflecting on the implementation and how different weights affect the prediction 
+    * yep (1P)
