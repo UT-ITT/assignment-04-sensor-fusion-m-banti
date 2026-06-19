@@ -8,7 +8,7 @@
 * Perspective transformation to the target resolution works 
     * yep (2P)
 * Command line parameters and shortcuts work 
-    * Please use short cuts consistent with the instruction, i thought the application crashed at first, but still fine (1P) 
+    * Please use shortcuts consistent with the instruction, I thought the application crashed at first, but still fine (1P) 
 
 ## 2. AR Game (9.5/10P)
 * The region of interest is detected, extracted, transformed, and displayed 
